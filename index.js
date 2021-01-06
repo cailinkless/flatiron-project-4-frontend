@@ -4,6 +4,7 @@ let deck
 
 window.addEventListener("DOMContentLoaded", () => {
     document.getElementById("welcome").addEventListener('click', welcomeMessage)
+    document.getElementById("browse").addEventListener('click', displayVignetteIndex)
     document.getElementById("start-reading").addEventListener('click', startReading)
     document.getElementById("dictionary").addEventListener('click', getCards)
     createDeck()
@@ -29,6 +30,65 @@ function welcomeMessage() {
     Possible meanings of your card combination will be suggested, but since readings are highly dependent on your personal context and mental associations, we encourage you to share your own interpretation, and browse vignette interpretations by other community members.
     <br><br>Happy Reading!</p>
     `
+}
+
+// Feature: Vignette Index
+
+function displayVignetteIndex() {
+    let main = document.querySelector("main")
+    main.innerHTML = ""
+    main.innerHTML = `
+        <h3>Community Vignettes:</h3>
+        <ul id="vignette-index"></ul>
+    `
+    let vignetteIndex = document.getElementById("vignette-index")
+    fetch(BASE_URL + '/vignettes')
+    .then(res => res.json())
+    .then(vignettes => {
+        vignettes.map(vignette => {
+            vignetteIndex.innerHTML += `
+                <li><a href="#" data-id="${vignette.id}">${vignette.title}</a></li>
+            `
+        })
+        attachClicksToVignettes()
+    })
+}
+
+function attachClicksToVignettes() {
+    let vignettes = document.querySelectorAll("li a")
+    vignettes.forEach(vignette => {
+        vignette.addEventListener('click', showVignette)
+    })
+}
+
+function showVignette(e) {
+    debugger
+    let id = e.target.dataset.id
+    let main = document.querySelector("main")
+    main.innerHTML = ""
+    fetch(BASE_URL + `/vignettes/${id}`)
+    .then(res => res.json())
+    .then(vignette => {
+        main.innerHTML = `
+            <h2>${vignette.title}</h2>
+            <h4>Pairings:</h4>
+            <ul id="pairings">
+            </ul>
+            <ol id="interpretations">
+            </ol>
+        `
+        let pairList = document.getElementById("pairings")
+        pairList.innerHTML += `
+                <li>${vignette.first_pairing}</li>
+                <li>${vignette.second_pairing}</li>
+            `
+        let interpretationList = document.getElementById("interpretations")
+        vignette.interpretations.map(interpretation => {
+            interpretationList.innerHTML += `
+                <li>${interpretation.content}</li>
+            `
+        })
+    })
 }
 
 // Feature: Card Dictionary
@@ -292,32 +352,32 @@ function submitInterpretation(e) {
     })
 }
 
-function showVignette(vignette) {
-    let main = document.querySelector("main")
-    main.innerHTML = ""
-    main.innerHTML += `
-        <h3>Vignette: ${vignette.title}</h3>
-        <div id="VC1"></div>
-        <div id="VC2"></div>
-        <div id="VC3"></div>
-        <h4>Combination of Pairings <i>${vignette.first_pairing}</i> and <i>${vignette.second_pairing}</i></h4>
-        <p><strong>Possible ${vignette.first_pairing} Meanings:</strong></p>
-        <p><strong>Possible ${vignette.second_pairing} Meanings:</strong></p>
-        <h4>Community Interpretations</h4>
-        <ul id="interpretations"></ul>
-    `
-    debugger
-    if (vignette.interpretations == null) {
-        main.innerHTML += "There are no community interpretations for this card yet."
-    } else {
-        let interpretationsList = document.getElementById('interpretations')
-        vignette.interpretations.forEach(interpretation =>
-            interpretationsList.innerHTML += `
-                <li>${interpretation}</li>
-            `
-        )
-    }
-}
+// function showVignette(vignette) {
+//     let main = document.querySelector("main")
+//     main.innerHTML = ""
+//     main.innerHTML += `
+//         <h3>Vignette: ${vignette.title}</h3>
+//         <div id="VC1"></div>
+//         <div id="VC2"></div>
+//         <div id="VC3"></div>
+//         <h4>Combination of Pairings <i>${vignette.first_pairing}</i> and <i>${vignette.second_pairing}</i></h4>
+//         <p><strong>Possible ${vignette.first_pairing} Meanings:</strong></p>
+//         <p><strong>Possible ${vignette.second_pairing} Meanings:</strong></p>
+//         <h4>Community Interpretations</h4>
+//         <ul id="interpretations"></ul>
+//     `
+//     debugger
+//     if (vignette.interpretations == null) {
+//         main.innerHTML += "There are no community interpretations for this card yet."
+//     } else {
+//         let interpretationsList = document.getElementById('interpretations')
+//         vignette.interpretations.forEach(interpretation =>
+//             interpretationsList.innerHTML += `
+//                 <li>${interpretation}</li>
+//             `
+//         )
+//     }
+// }
 
 // function createOrUpdateVignette(e) {
 //     e.preventDefault()
