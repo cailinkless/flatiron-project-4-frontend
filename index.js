@@ -179,14 +179,14 @@ function displayVignetteIndex() {
 function attachClicksToVignettes() {
     let vignettes = document.querySelectorAll("li a")
     vignettes.forEach(vignette => {
-        vignette.addEventListener('click', showVignette)
+        vignette.addEventListener('click', (e) => showVignette(e.target.dataset.id))
     })
 }
 
-function showVignette(e) {
+function showVignette(id) {
     // debugger
-    let id = e.target.dataset.id
-    let main = Formatter.clearMain()
+    // let id = e.target.dataset.id
+    // let main = Formatter.clearMain()
     fetch(BASE_URL + `/vignettes/${id}`)
     .then(res => res.json())
     .then(data => {
@@ -194,28 +194,6 @@ function showVignette(e) {
         // Formatter.renderVignette(vignette)
         vignette.renderVignette()
     })
-    // .then(vignette => {
-        // main.innerHTML = `
-        //     <h2>${vignette.title}</h2>
-        //     <h4>Pairings:</h4>
-        //     <ul id="pairings">
-        //     </ul>
-        //     <h4>User Interpretations:</h4>
-        //     <ol id="interpretations">
-        //     </ol>
-        // `
-        // let pairList = document.getElementById("pairings")
-        // pairList.innerHTML += `
-        //         <li>${vignette.first_pairing}</li>
-        //         <li>${vignette.second_pairing}</li>
-        //     `
-        // let interpretationList = document.getElementById("interpretations")
-        // vignette.interpretations.map(interpretation => {
-        //     interpretationList.innerHTML += `
-        //         <li>${interpretation.content}</li>
-        //     `
-    //     })
-    // })
 }
 
 // Feature: Card Dictionary
@@ -414,10 +392,10 @@ function displayVignetteForm() {
         </form>
     `
     formDiv.innerHTML = html
-    document.querySelector('form').addEventListener('submit', saveVignette)
+    document.querySelector('form').addEventListener('submit', createVignette)
 }
 
-function saveVignette(e) {
+function createVignette(e) {
     e.preventDefault()
     let vignette = {
         title: e.target.querySelector('#title').value,
@@ -469,6 +447,11 @@ function submitInterpretation(e) {
         }
     }
     fetch(BASE_URL + '/interpretations', configObject)
-    .then(res =>  res.json())
-    // .then(showVignette())
+    .then(res => res.json())
+    .then(int => {
+        // fetch(BASE_URL + `/vignettes/${parseInt(int.vignette_id)}`)
+        // .then(res => res.json)
+        // .then(data => {
+        showVignette(int.vignette_id)
+    })  
 }
