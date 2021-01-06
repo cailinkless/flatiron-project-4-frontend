@@ -174,7 +174,6 @@ function showPairing(e) {
             <h2>${pairing.name}</h2>
             <h4>Common Interpretations:</h4>
             <p>${pairing.meaning}</p>
-            <h4>User Interpretations:</h4>
         `
     })
 }
