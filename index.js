@@ -4,7 +4,8 @@ let deck
 
 window.addEventListener("DOMContentLoaded", () => {
     document.getElementById("start-reading").addEventListener('click', startReading)
-    getCards()
+    document.getElementById("dictionary").addEventListener('click', getCards)
+    createDeck()
 })
 
 function startReading() {
@@ -107,20 +108,26 @@ function thirdDraw() {
     `
 }
 
-function getCards() {
-    let cardIndex = document.getElementById("card-index")
-    // do i need to blank card index here?
+function createDeck() {
     fetch(BASE_URL + '/cards')
     .then(res => res.json())
-    .then(cards => {
-        deck = cards
-        deck.map(card => {
-            cardIndex.innerHTML += `
+    .then(cards => deck = cards)
+}
+
+function getCards() {
+    let main = document.querySelector("main")
+    main.innerHTML = ""
+    main.innerHTML = `
+        <h3>Card Dictionary</h3>
+        <ul id="card-index"></ul>
+    `
+    let cardIndex = document.getElementById("card-index")
+    deck.map(card => {
+        cardIndex.innerHTML += `
             <li><a href="#" data-id="${card.id}">${card.number}. ${card.name}</a></li>
-            `
+        `
         })
         attachClicksToCardLinks()
-    })
 }
 
 function attachClicksToCardLinks() {
