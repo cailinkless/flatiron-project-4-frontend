@@ -51,6 +51,7 @@ function firstDraw() {
 }
 
 function secondDraw() {
+    // pick and display second card:
     let card1 = parseInt(document.getElementById("first-card-id").innerHTML.split(". ")[0])
     let card2 = document.getElementById("card-2")
     card2.innerHTML = ""
@@ -66,6 +67,15 @@ function secondDraw() {
     `
     let thirdButton = document.getElementById('3rd-draw')
     thirdButton.disabled = false
+    // display information on the pairings of cards 1 & 2:
+    // debugger
+    let possPairings = deck.find(i => i.id === card1).pairings
+    let pairing = possPairings.find(pairing => pairing.card_2 === card.id)
+    let main = document.querySelector("main")
+    main.innerHTML += `
+        <h4>The ${pairing.name} Combination</h4>
+        <p>Possible Meanings: ${pairing.meaning}</p>
+    `
     // thirdButton.addEventListener('click', thirdDraw)
 }
 
