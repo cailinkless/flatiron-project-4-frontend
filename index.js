@@ -1,10 +1,54 @@
 const BASE_URL = 'http://localhost:3000'
 
+let deck
+
 window.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("start-reading").addEventListener('click', startReading)
     getCards()
 })
 
-let deck
+function startReading() {
+    let main = document.querySelector("main")
+    main.innerHTML = ""
+    main.innerHTML = `
+        <div id="card-1">
+            <input type="button" value="Draw Card 1" id="1st-draw">
+        </div>
+
+        <div id="card-2">
+            <input type="button" value="Draw Card 2" id="2nd-draw" disabled>
+        </div>
+
+        <div id="card-3">
+            <input type="button" value="Draw Card 3" id="3rd-draw" disabled>
+        </div>
+    `
+    attachClicksToReading()
+}
+
+function attachClicksToReading() {
+    let firstButton = document.getElementById('1st-draw')
+    firstButton.addEventListener('click', firstDraw)
+}
+
+function getRandomCardId() {
+    return Math.floor(Math.random() * Math.floor(35)) + 1;
+}
+
+function firstDraw() {
+    let card1 = document.getElementById("card-1")
+    card1.innerHTML = ""
+    let cardId = getRandomCardId()
+    let card = deck.find(card => card.id == cardId)
+    card1.innerHTML = `
+        <h3>First Card:</h3>
+        <h3>${card.number}. ${card.name}</h3>
+        <p>Keyword: ${card.keyword}<br><br>Details: ${card.description}</p>
+    `
+    let secondButton = document.getElementById('2nd-draw')
+    secondButton.disabled = false
+    // secondButton.addEventListener('click', secondDraw)
+}
 
 function getCards() {
     let cardIndex = document.getElementById("card-index")
