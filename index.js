@@ -62,7 +62,7 @@ function attachClicksToVignettes() {
 }
 
 function showVignette(e) {
-    debugger
+    // debugger
     let id = e.target.dataset.id
     let main = document.querySelector("main")
     main.innerHTML = ""
@@ -278,8 +278,10 @@ function displayVignetteForm() {
     let firstPairing = possPairings1.find(pairing => pairing.card_2 === parseInt(document.getElementById("second-card-id").innerHTML.split(". ")[0]))
     let possPairings2 = deck.find(card => card.id === parseInt(document.getElementById("second-card-id").innerHTML.split(". ")[0])).pairings
     let secondPairing = possPairings2.find(pairing => pairing.card_2 === parseInt(document.getElementById("third-card-id").innerHTML.split(". ")[0]))
+    let thirdCard = deck.find(card => card.id === parseInt(document.getElementById("third-card-id").innerHTML.split(". ")[0]))
     let html = `
         <form>
+        <input type="hidden" id="title" name="title" value="${firstPairing.name} + ${thirdCard.name.split(" ")[1]}"></input>
         <input type="hidden" id="first_card" name="first_card" value="${parseInt(document.getElementById("first-card-id").innerHTML.split(". ")[0])}"></input>
         <input type="hidden" id="second_card" name="second_card" value="${parseInt(document.getElementById("second-card-id").innerHTML.split(". ")[0])}"></input>
         <input type="hidden" id="third_card" name="third_card" value="${parseInt(document.getElementById("third-card-id").innerHTML.split(". ")[0])}"></input>
@@ -292,12 +294,10 @@ function displayVignetteForm() {
     document.querySelector('form').addEventListener('submit', saveVignette)
 }
 
-//         <input type="text" id="user-interpretation" name="user-interpretation"></input>
-
 function saveVignette(e) {
     e.preventDefault()
     let vignette = {
-        title: `${e.target.querySelector('#first_card').value} + ${e.target.querySelector('#second_card').value} + ${e.target.querySelector('#third_card').value}`,
+        title: e.target.querySelector('#title').value,
         first_card: e.target.querySelector('#first_card').value,
         second_card: e.target.querySelector('#second_card').value,
         third_card: e.target.querySelector('#third_card').value,
@@ -346,114 +346,6 @@ function submitInterpretation(e) {
         }
     }
     fetch(BASE_URL + '/interpretations', configObject)
-    .then(res => res.json())
-    .then(interpretation => {
-        showVignette(interpretation.vignette)
-    })
+    .then(res =>  res.json())
+    // .then(showVignette())
 }
-
-// function showVignette(vignette) {
-//     let main = document.querySelector("main")
-//     main.innerHTML = ""
-//     main.innerHTML += `
-//         <h3>Vignette: ${vignette.title}</h3>
-//         <div id="VC1"></div>
-//         <div id="VC2"></div>
-//         <div id="VC3"></div>
-//         <h4>Combination of Pairings <i>${vignette.first_pairing}</i> and <i>${vignette.second_pairing}</i></h4>
-//         <p><strong>Possible ${vignette.first_pairing} Meanings:</strong></p>
-//         <p><strong>Possible ${vignette.second_pairing} Meanings:</strong></p>
-//         <h4>Community Interpretations</h4>
-//         <ul id="interpretations"></ul>
-//     `
-//     debugger
-//     if (vignette.interpretations == null) {
-//         main.innerHTML += "There are no community interpretations for this card yet."
-//     } else {
-//         let interpretationsList = document.getElementById('interpretations')
-//         vignette.interpretations.forEach(interpretation =>
-//             interpretationsList.innerHTML += `
-//                 <li>${interpretation}</li>
-//             `
-//         )
-//     }
-// }
-
-// function createOrUpdateVignette(e) {
-//     e.preventDefault()
-    // let vignette = {
-    //     title: `${e.target.querySelector('#first_card').value} + ${e.target.querySelector('#second_card').value} + ${e.target.querySelector('#third_card').value}`,
-    //     first_card: e.target.querySelector('#first_card').value,
-    //     second_card: e.target.querySelector('#second_card').value,
-    //     third_card: e.target.querySelector('#third_card').value,
-    //     first_pairing: e.target.querySelector('#first_pairing').value,
-    //     second_pairing: e.target.querySelector('#second_pairing').value,
-    // }
-//     // debugger
-    // let configObject = {
-    //     method: 'POST',
-    //     body: JSON.stringify(vignette),
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //         'Accept': 'application/json'
-    //     }
-    // }
-//     let vignetteData
-//     fetch(BASE_URL + '/vignettes', configObject).then(response => {
-//         if (response.ok) {
-//             return response.json();
-//         } else {
-//             return Promise.reject(response);
-//         }
-//     })
-//     .then(data => {
-//         // store vignette data
-//         vignetteData = data
-//         // post interpretation
-//         let interpretation = {
-//             foreign_key: vignetteData.id,
-//             content: e.target.querySelector('#user-interpretation').value
-//         }
-//         // debugger
-//         let configObject2 = {
-//             method: 'POST',
-//             body: JSON.stringify(interpretation),
-//             headers: {
-//                 'Content-Type': 'application/json',
-//                 'Accept': 'applications/json'
-//             }
-//         }
-//         fetch(BASE_URL + '/interpretations', configObject2)    
-//     })
-//     .then(() => {
-//         fetch(BASE_URL + `/vignettes/${vignetteData.id}`)
-//         .then(res => res.json())
-//     })
-//     .then(vignette => {
-//         let main = document.querySelector("main")
-//         main.innerHTML = ""
-//         main.innerHTML += `
-        //     <h3>Vignette: ${vignette.title}</h3>
-        //     <div id="VC1"></div>
-        //     <div id="VC2"></div>
-        //     <div id="VC3"></div>
-        //     <h4>Combination of Pairings <i>${vignette.first_pairing}</i> and <i>${vignette.second_pairing}</i></h4>
-        //     <p><strong>Possible ${vignette.first_pairing} Meanings:</strong></p>
-        //     <p><strong>Possible ${vignette.second_pairing} Meanings:</strong></p>
-        //     <h4>Community Interpretations</h4>
-        //     <ul id="interpretations"></ul>
-        // `
-        // if (vignette.interpretations == null) {
-        //     main.innerHTML += "There are no community interpretations for this card yet."
-        // } else {
-        //     let interpretationsList = document.getElementById('interpretations')
-        //     vignette.interpretations.forEach(interpretation =>
-        //         interpretationsList.innerHTML += `
-        //             <li>${interpretation}</li>
-//                 `
-//             )
-//         }
-//     })
-// }
-
-
