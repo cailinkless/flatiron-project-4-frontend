@@ -10,6 +10,14 @@ window.addEventListener("DOMContentLoaded", () => {
     welcomeMessage()
 })
 
+// Basic Setup
+
+function createDeck() {
+    fetch(BASE_URL + '/cards')
+    .then(res => res.json())
+    .then(cards => deck = cards)
+}
+
 function welcomeMessage() {
     let main = document.querySelector("main")
     main.innerHTML = ""
@@ -23,6 +31,82 @@ function welcomeMessage() {
     `
 }
 
+// Feature: Card Dictionary
+
+function getCards() {
+    let main = document.querySelector("main")
+    main.innerHTML = ""
+    main.innerHTML = `
+        <h3>Card Dictionary</h3>
+        <ul id="card-index"></ul>
+    `
+    let cardIndex = document.getElementById("card-index")
+    deck.map(card => {
+        cardIndex.innerHTML += `
+            <li><a href="#" data-id="${card.id}">${card.number}. ${card.name}</a></li>
+        `
+        })
+        attachClicksToCardLinks()
+}
+
+function attachClicksToCardLinks() {
+    let cards = document.querySelectorAll("li a")
+    cards.forEach(card => {
+        card.addEventListener('click', showCard)
+    })
+}
+
+function showCard(e) {
+    let id = e.target.dataset.id
+    let main = document.querySelector("main")
+    main.innerHTML = ""
+    fetch(BASE_URL + `/cards/${id}`)
+    .then(res => res.json())
+    .then(card => {
+        main.innerHTML = `
+            <h2>${card.number}. ${card.name}</h2>
+            <h4>Keyword: ${card.keyword}</h4>
+            <h4>Common Card: ${card.common_card}</h4>
+            <p>Description: ${card.description}</p>
+            <h4>Pairings:</h4>
+            <ul id="pairings">
+            </ul>
+        `
+        let pairList = document.getElementById("pairings")
+        card.pairings.forEach(pairing => {
+            pairList.innerHTML += `
+                <li><a href="#" data-id="${pairing.id}" class="pairing">+ ${deck.find(card => card.number == pairing.card_2).name}</a></li>
+            `
+        })
+        attachClicksToPairingLinks()
+    })
+}
+
+function attachClicksToPairingLinks() {
+    let pairings = document.querySelectorAll('.pairing')
+    pairings.forEach(pairing => {
+        pairing.addEventListener('click', showPairing)
+    })
+}
+
+function showPairing(e) {
+    let id = e.target.dataset.id
+    let main = document.querySelector("main")
+    main.innerHTML = ""
+    fetch(BASE_URL + `/pairings/${id}`)
+    .then(res => res.json())
+    .then(pairing => {
+        main.innerHTML = `
+            <h2>${pairing.name}</h2>
+            <h4>Common Interpretations:</h4>
+            <p>${pairing.meaning}</p>
+        `
+    })
+}
+
+
+
+// Practice Reading
 
 
 function startReading() {
@@ -146,134 +230,84 @@ function displayInterpretationForm() {
         </form>
     `
     formDiv.innerHTML = html
-    document.querySelector('form').addEventListener('submit', createOrUpdateVignette)
+    // document.querySelector('form').addEventListener('submit', createOrUpdateVignette)
 }
 
-function createOrUpdateVignette(e) {
-    e.preventDefault()
-    let vignette = {
-        title: `${e.target.querySelector('#first_card').value} + ${e.target.querySelector('#second_card').value} + ${e.target.querySelector('#third_card').value}`,
-        first_card: e.target.querySelector('#first_card').value,
-        second_card: e.target.querySelector('#second_card').value,
-        third_card: e.target.querySelector('#third_card').value,
-        first_pairing: e.target.querySelector('#first_pairing').value,
-        second_pairing: e.target.querySelector('#second_pairing').value,
-        interpretations: [
-            e.target.querySelector('#user-interpretation').value
-        ]
-    }
-    let configObject = {
-        method: 'POST',
-        body: JSON.stringify(vignette),
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
-    }
-    fetch(BASE_URL + '/vignettes', configObject)
-    .then(res => res.json())
-    .then(vignette => {
-        let main = document.querySelector("main")
-        main.innerHTML = ""
-        main.innerHTML += `
-            <h3>Vignette: ${vignette.title}</h3>
-            <div id="VC1"></div>
-            <div id="VC2"></div>
-            <div id="VC3"></div>
-            <h4>Combination of Pairings <i>${vignette.first_pairing}</i> and <i>${vignette.second_pairing}</i></h4>
-            <p><strong>Possible ${vignette.first_pairing} Meanings:</strong></p>
-            <p><strong>Possible ${vignette.second_pairing} Meanings:</strong></p>
-            <h4>Community Interpretations</h4>
-            <ul id="interpretations"></ul>
-        `
-        if (vignette.interpretations == null) {
-            main.innerHTML += "There are no community interpretations for this card yet."
-        } else {
-            let interpretationsList = document.getElementById('interpretations')
-            vignette.interpretations.forEach(interpretation =>
-                interpretationsList.innerHTML += `
-                    <li>${interpretation}</li>
-                `
-            )
-        }
-    })
-}
-
-function createDeck() {
-    fetch(BASE_URL + '/cards')
-    .then(res => res.json())
-    .then(cards => deck = cards)
-}
-
-function getCards() {
-    let main = document.querySelector("main")
-    main.innerHTML = ""
-    main.innerHTML = `
-        <h3>Card Dictionary</h3>
-        <ul id="card-index"></ul>
-    `
-    let cardIndex = document.getElementById("card-index")
-    deck.map(card => {
-        cardIndex.innerHTML += `
-            <li><a href="#" data-id="${card.id}">${card.number}. ${card.name}</a></li>
-        `
-        })
-        attachClicksToCardLinks()
-}
-
-function attachClicksToCardLinks() {
-    let cards = document.querySelectorAll("li a")
-    cards.forEach(card => {
-        card.addEventListener('click', showCard)
-    })
-}
-
-function showCard(e) {
-    let id = e.target.dataset.id
-    let main = document.querySelector("main")
-    main.innerHTML = ""
-    fetch(BASE_URL + `/cards/${id}`)
-    .then(res => res.json())
-    .then(card => {
-        main.innerHTML = `
-            <h2>${card.number}. ${card.name}</h2>
-            <h4>Keyword: ${card.keyword}</h4>
-            <h4>Common Card: ${card.common_card}</h4>
-            <p>Description: ${card.description}</p>
-            <h4>Pairings:</h4>
-            <ul id="pairings">
-            </ul>
-        `
-        let pairList = document.getElementById("pairings")
-        card.pairings.forEach(pairing => {
-            pairList.innerHTML += `
-                <li><a href="#" data-id="${pairing.id}" class="pairing">+ ${deck.find(card => card.number == pairing.card_2).name}</a></li>
-            `
-        })
-        attachClicksToPairingLinks()
-    })
-}
-
-function attachClicksToPairingLinks() {
-    let pairings = document.querySelectorAll('.pairing')
-    pairings.forEach(pairing => {
-        pairing.addEventListener('click', showPairing)
-    })
-}
-
-function showPairing(e) {
-    let id = e.target.dataset.id
-    let main = document.querySelector("main")
-    main.innerHTML = ""
-    fetch(BASE_URL + `/pairings/${id}`)
-    .then(res => res.json())
-    .then(pairing => {
-        main.innerHTML = `
-            <h2>${pairing.name}</h2>
-            <h4>Common Interpretations:</h4>
-            <p>${pairing.meaning}</p>
-        `
-    })
-}
+// function createOrUpdateVignette(e) {
+//     e.preventDefault()
+//     let vignette = {
+//         title: `${e.target.querySelector('#first_card').value} + ${e.target.querySelector('#second_card').value} + ${e.target.querySelector('#third_card').value}`,
+//         first_card: e.target.querySelector('#first_card').value,
+//         second_card: e.target.querySelector('#second_card').value,
+//         third_card: e.target.querySelector('#third_card').value,
+//         first_pairing: e.target.querySelector('#first_pairing').value,
+//         second_pairing: e.target.querySelector('#second_pairing').value,
+//     }
+//     // debugger
+//     let configObject = {
+//         method: 'POST',
+//         body: JSON.stringify(vignette),
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'Accept': 'application/json'
+//         }
+//     }
+//     let vignetteData
+//     fetch(BASE_URL + '/vignettes', configObject).then(response => {
+//         if (response.ok) {
+//             return response.json();
+//         } else {
+//             return Promise.reject(response);
+//         }
+//     })
+//     .then(data => {
+//         // store vignette data
+//         vignetteData = data
+//         // post interpretation
+//         let interpretation = {
+//             foreign_key: vignetteData.id,
+//             content: e.target.querySelector('#user-interpretation').value
+//         }
+//         // debugger
+//         let configObject2 = {
+//             method: 'POST',
+//             body: JSON.stringify(interpretation),
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'Accept': 'applications/json'
+//             }
+//         }
+//         fetch(BASE_URL + '/interpretations', configObject2)    
+//     })
+//     .then(() => {
+//         fetch(BASE_URL + `/vignettes/${vignetteData.id}`)
+//         .then(res => res.json())
+//     })
+//     .then(vignette => {
+//         let main = document.querySelector("main")
+//         main.innerHTML = ""
+//         main.innerHTML += `
+//             <h3>Vignette: ${vignette.title}</h3>
+//             <div id="VC1"></div>
+//             <div id="VC2"></div>
+//             <div id="VC3"></div>
+//             <h4>Combination of Pairings <i>${vignette.first_pairing}</i> and <i>${vignette.second_pairing}</i></h4>
+//             <p><strong>Possible ${vignette.first_pairing} Meanings:</strong></p>
+//             <p><strong>Possible ${vignette.second_pairing} Meanings:</strong></p>
+//             <h4>Community Interpretations</h4>
+//             <ul id="interpretations"></ul>
+//         `
+//         if (vignette.interpretations == null) {
+//             main.innerHTML += "There are no community interpretations for this card yet."
+//         } else {
+//             let interpretationsList = document.getElementById('interpretations')
+//             vignette.interpretations.forEach(interpretation =>
+//                 interpretationsList.innerHTML += `
+//                     <li>${interpretation}</li>
+//                 `
+//             )
+//         }
+//     })
+// }
 
 
