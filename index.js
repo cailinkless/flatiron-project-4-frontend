@@ -1,6 +1,9 @@
 const BASE_URL = 'http://localhost:3000'
 
 let deck
+let firstCard
+let secondCard
+let thirdCard
 
 window.addEventListener("DOMContentLoaded", () => {
     document.getElementById("welcome").addEventListener('click', welcomeMessage)
@@ -26,7 +29,7 @@ class Card {
     }
 
     renderCard() {
-
+        //do as get method type???
     }
 
 }
@@ -63,7 +66,7 @@ class Vignette {
     }
 
     addInterpretation() {
-        
+
     }
 
 }
@@ -77,17 +80,31 @@ class Interpretation {
 
 }
 
+// Helper Classes
+
+class Formatter {
+
+    static clearMain() {
+        let main = document.querySelector("main")
+        main.innerHTML = ""
+        return main
+    }
+
+}
+
 // Basic Setup
 
+
+// Gets array of 36 cards to work with
 function createDeck() {
     fetch(BASE_URL + '/cards')
     .then(res => res.json())
     .then(cards => deck = cards)
 }
 
+// Default message upon arrival and when 'Home' button is clicked
 function welcomeMessage() {
-    let main = document.querySelector("main")
-    main.innerHTML = ""
+    let main = Formatter.clearMain()
     main.innerHTML = `
     <p><strong>Welcome to the Lenormand Phrasebook!</strong>
     <br><br>
@@ -101,8 +118,7 @@ function welcomeMessage() {
 // Feature: Vignette Index
 
 function displayVignetteIndex() {
-    let main = document.querySelector("main")
-    main.innerHTML = ""
+    let main = Formatter.clearMain()
     main.innerHTML = `
         <h3>Community Vignettes:</h3>
         <ul id="vignette-index"></ul>
@@ -130,8 +146,7 @@ function attachClicksToVignettes() {
 function showVignette(e) {
     // debugger
     let id = e.target.dataset.id
-    let main = document.querySelector("main")
-    main.innerHTML = ""
+    let main = Formatter.clearMain()
     fetch(BASE_URL + `/vignettes/${id}`)
     .then(res => res.json())
     .then(vignette => {
@@ -161,8 +176,7 @@ function showVignette(e) {
 // Feature: Card Dictionary
 
 function getCards() {
-    let main = document.querySelector("main")
-    main.innerHTML = ""
+    let main = Formatter.clearMain()
     main.innerHTML = `
         <h3>Card Dictionary</h3>
         <ul id="card-index"></ul>
@@ -185,8 +199,7 @@ function attachClicksToCardLinks() {
 
 function showCard(e) {
     let id = e.target.dataset.id
-    let main = document.querySelector("main")
-    main.innerHTML = ""
+    let main = Formatter.clearMain()
     fetch(BASE_URL + `/cards/${id}`)
     .then(res => res.json())
     .then(card => {
@@ -219,8 +232,7 @@ function attachClicksToPairingLinks() {
 
 function showPairing(e) {
     let id = e.target.dataset.id
-    let main = document.querySelector("main")
-    main.innerHTML = ""
+    let main = Formatter.clearMain()
     fetch(BASE_URL + `/pairings/${id}`)
     .then(res => res.json())
     .then(pairing => {
@@ -238,8 +250,7 @@ function showPairing(e) {
 
 
 function startReading() {
-    let main = document.querySelector("main")
-    main.innerHTML = ""
+    let main = Formatter.clearMain()
     main.innerHTML = `
         <div id="card-1">
             <input type="button" value="Draw Card 1" id="1st-draw">
