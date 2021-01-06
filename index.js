@@ -11,6 +11,72 @@ window.addEventListener("DOMContentLoaded", () => {
     welcomeMessage()
 })
 
+// Object Classes
+
+class Card {
+
+    constructor(number, name, img_url, keyword, description, common_card, pairings) {
+        this.number = number
+        this.name = name
+        this.img_url = img_url
+        this.keyword = keyword
+        this.description = description
+        this.common_card = common_card
+        this.pairings = pairings
+    }
+
+    renderCard() {
+
+    }
+
+}
+
+class Pairing {
+
+    constructor(name, card_2, meaning, card) {
+        this.name = name
+        this.card_2 = card_2
+        this.meaning = meaning
+        this.card = card 
+    }
+
+    renderPairing() {
+
+    }
+
+}
+
+class Vignette {
+
+    constructor(title, first_card, second_card, third_card, first_pairing, second_pairing, interpretations) {
+        this.title = title
+        this.first_card = first_card
+        this.second_card = second_card
+        this.third_card = third_card
+        this.first_pairing = first_pairing
+        this.second_pairing = second_pairing
+        this.interpretations = interpretations
+    }
+
+    renderVignette() {
+
+    }
+
+    addInterpretation() {
+        
+    }
+
+}
+
+class Interpretation {
+
+    constructor(content, vignette_id) {
+        this.content = content
+        this.vignette_id = vignette_id
+    }
+
+}
+
 // Basic Setup
 
 function createDeck() {
@@ -74,6 +140,7 @@ function showVignette(e) {
             <h4>Pairings:</h4>
             <ul id="pairings">
             </ul>
+            <h4>User Interpretations:</h4>
             <ol id="interpretations">
             </ol>
         `
