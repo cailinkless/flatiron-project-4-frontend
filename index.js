@@ -1,9 +1,18 @@
+// Startup Info
+
 const BASE_URL = 'http://localhost:3000'
 
 let deck
 let firstCard
 let secondCard
 let thirdCard
+
+// Gets array of 36 cards to work with
+function createDeck() {
+    fetch(BASE_URL + '/cards')
+    .then(res => res.json())
+    .then(cards => deck = cards)
+}
 
 window.addEventListener("DOMContentLoaded", () => {
     document.getElementById("welcome").addEventListener('click', welcomeMessage)
@@ -106,43 +115,9 @@ class Formatter {
         return main
     }
 
-    static renderVignette(vignette) {
-        let main = Formatter.clearMain()
-        main.innerHTML = `
-             <h2>${vignette.title}</h2>
-             <h4>Pairings:</h4>
-             <ul id="pairings">
-             </ul>
-             <h4>User Interpretations:</h4>
-             <ol id="interpretations">
-             </ol>
-        `
-        let pairList = document.getElementById("pairings")
-        pairList.innerHTML += `
-            <li>${vignette.first_pairing}</li>
-            <li>${vignette.second_pairing}</li>
-        `
-        let interpretationList = document.getElementById("interpretations")
-        vignette.interpretations.map(interpretation => {
-            interpretationList.innerHTML += `
-                <li>${interpretation.content}</li>
-            `
-        })
-    }
-
 }
 
-// Basic Setup
-
-
-// Gets array of 36 cards to work with
-function createDeck() {
-    fetch(BASE_URL + '/cards')
-    .then(res => res.json())
-    .then(cards => deck = cards)
-}
-
-// Default message upon arrival and when 'Home' button is clicked
+// Welcome: Upon arrival and when 'Home' button is clicked
 function welcomeMessage() {
     let main = Formatter.clearMain()
     main.innerHTML = `
@@ -184,14 +159,10 @@ function attachClicksToVignettes() {
 }
 
 function showVignette(id) {
-    // debugger
-    // let id = e.target.dataset.id
-    // let main = Formatter.clearMain()
     fetch(BASE_URL + `/vignettes/${id}`)
     .then(res => res.json())
     .then(data => {
         let vignette = new Vignette(data.title, data.first_card, data.second_card, data.third_card, data.first_pairing, data.second_pairing, data.interpretations)
-        // Formatter.renderVignette(vignette)
         vignette.renderVignette()
     })
 }
@@ -267,9 +238,7 @@ function showPairing(e) {
     })
 }
 
-
-
-// Practice Reading
+// Practice Reading Feature
 
 
 function startReading() {
@@ -448,10 +417,5 @@ function submitInterpretation(e) {
     }
     fetch(BASE_URL + '/interpretations', configObject)
     .then(res => res.json())
-    .then(int => {
-        // fetch(BASE_URL + `/vignettes/${parseInt(int.vignette_id)}`)
-        // .then(res => res.json)
-        // .then(data => {
-        showVignette(int.vignette_id)
-    })  
+    .then(int => showVignette(int.vignette_id))  
 }
