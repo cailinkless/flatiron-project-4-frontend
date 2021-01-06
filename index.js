@@ -42,12 +42,31 @@ function firstDraw() {
     let card = deck.find(card => card.id == cardId)
     card1.innerHTML = `
         <h3>First Card:</h3>
-        <h3>${card.number}. ${card.name}</h3>
+        <h3 id="first-card-id">${card.number}. ${card.name}</h3>
         <p>Keyword: ${card.keyword}<br><br>Details: ${card.description}</p>
     `
     let secondButton = document.getElementById('2nd-draw')
     secondButton.disabled = false
-    // secondButton.addEventListener('click', secondDraw)
+    secondButton.addEventListener('click', secondDraw)
+}
+
+function secondDraw() {
+    let card1 = parseInt(document.getElementById("first-card-id").innerHTML.split(". ")[0])
+    let card2 = document.getElementById("card-2")
+    card2.innerHTML = ""
+    let cardId = getRandomCardId()
+    if (cardId === card1) {
+        cardId === 36 ? cardId -= 1 : cardId += 1
+    }
+    let card = deck.find(card => card.id === cardId)
+    card2.innerHTML = `
+        <h3>Second Card:</h3>
+        <h3 id="second-card-id">${card.number}. ${card.name}</h3>
+        <p>Keyword: ${card.keyword}<br><br>Details: ${card.description}</p>
+    `
+    let thirdButton = document.getElementById('3rd-draw')
+    thirdButton.disabled = false
+    // thirdButton.addEventListener('click', thirdDraw)
 }
 
 function getCards() {
