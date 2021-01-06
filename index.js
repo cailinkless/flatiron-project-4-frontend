@@ -65,18 +65,46 @@ function secondDraw() {
         <h3 id="second-card-id">${card.number}. ${card.name}</h3>
         <p>Keyword: ${card.keyword}<br><br>Details: ${card.description}</p>
     `
-    let thirdButton = document.getElementById('3rd-draw')
-    thirdButton.disabled = false
     // display information on the pairings of cards 1 & 2:
-    // debugger
     let possPairings = deck.find(i => i.id === card1).pairings
     let pairing = possPairings.find(pairing => pairing.card_2 === card.id)
     let main = document.querySelector("main")
     main.innerHTML += `
-        <h4>The ${pairing.name} Combination</h4>
+        <h4>First Pairing: ${pairing.name}</h4>
         <p>Possible Meanings: ${pairing.meaning}</p>
     `
-    // thirdButton.addEventListener('click', thirdDraw)
+    let thirdButton = document.getElementById('3rd-draw')
+    thirdButton.disabled = false
+    thirdButton.addEventListener('click', thirdDraw)
+}
+
+function thirdDraw() {
+    // establish cards 1 & 2:
+    let firstCardId = parseInt(document.getElementById("first-card-id").innerHTML.split(". ")[0])
+    let secondCardId = parseInt(document.getElementById("second-card-id").innerHTML.split(". ")[0])
+    // pick and display third card:
+    let thirdCardSpot = document.getElementById('card-3')
+    thirdCardSpot.innerHTML = ""
+    let thirdCardId = getRandomCardId()
+    if (thirdCardId === firstCardId || thirdCardId === secondCardId) {
+        thirdCardId === 36 ? thirdCardId -= 1 : thirdCardId += 1
+    }
+    let thirdCard = deck.find(card => card.id === thirdCardId)
+    thirdCardSpot.innerHTML += `
+        <h3>Third Card:</h3>
+        <h3 id="third-card-id">${thirdCard.number}. ${thirdCard.name}</h3>
+        <p>Keyword: ${thirdCard.keyword}<br><br>Details: ${thirdCard.description}</p>
+    `
+    // display information on the pairings of cards 2 & 3:
+    let possPairings = deck.find(card => card.id === secondCardId).pairings
+    let pairing = possPairings.find(pairing => pairing.card_2 === thirdCardId)
+    let main = document.querySelector("main")
+    main.innerHTML += `
+        <h4>Second Pairing: ${pairing.name}</h4>
+        <p>Possible Meanings: ${pairing.meaning}</p>
+        <h3>Reading this Vignette:</h3>
+        <p>Info on reading vignettes</p>
+    `
 }
 
 function getCards() {
