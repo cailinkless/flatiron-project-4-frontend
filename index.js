@@ -207,52 +207,137 @@ function thirdDraw() {
         <p>Possible Meanings: ${pairing.meaning}</p>
         <h3>Reading this Vignette:</h3>
         <p>Info on reading vignettes</p>
-        <div id="interpretation-form"></div>
+        <div id="vignette-form"></div>
     `
-    displayInterpretationForm()
+    displayVignetteForm()
 }
 
-function displayInterpretationForm() {
-    let formDiv = document.getElementById("interpretation-form")
+function displayVignetteForm() {
+    let formDiv = document.getElementById("vignette-form")
     let possPairings1 = deck.find(card => card.id === parseInt(document.getElementById("first-card-id").innerHTML.split(". ")[0])).pairings
     let firstPairing = possPairings1.find(pairing => pairing.card_2 === parseInt(document.getElementById("second-card-id").innerHTML.split(". ")[0]))
     let possPairings2 = deck.find(card => card.id === parseInt(document.getElementById("second-card-id").innerHTML.split(". ")[0])).pairings
     let secondPairing = possPairings2.find(pairing => pairing.card_2 === parseInt(document.getElementById("third-card-id").innerHTML.split(". ")[0]))
     let html = `
         <form>
-        <label>Add Your Interpretation:</label>
-        <input type="hidden" id="first_card" name="first_card" value="${parseInt(document.getElementById("first-card-id").innerHTML.split(". ")[0])}">
-        <input type="hidden" id="second_card" name="second_card" value="${parseInt(document.getElementById("second-card-id").innerHTML.split(". ")[0])}">
-        <input type="hidden" id="third_card" name="third_card" value="${parseInt(document.getElementById("third-card-id").innerHTML.split(". ")[0])}">
-        <input type="hidden" id="first_pairing" name="first_pairing" value="${firstPairing.name}">
-        <input type="hidden" id="second_pairing" name="second_pairing" value="${secondPairing.name}">
-        <input type="text" id="user-interpretation" name="user-interpretation"></input>
-        <input type="submit"></input>
+        <input type="hidden" id="first_card" name="first_card" value="${parseInt(document.getElementById("first-card-id").innerHTML.split(". ")[0])}"></input>
+        <input type="hidden" id="second_card" name="second_card" value="${parseInt(document.getElementById("second-card-id").innerHTML.split(". ")[0])}"></input>
+        <input type="hidden" id="third_card" name="third_card" value="${parseInt(document.getElementById("third-card-id").innerHTML.split(". ")[0])}"></input>
+        <input type="hidden" id="first_pairing" name="first_pairing" value="${firstPairing.name}"></input>
+        <input type="hidden" id="second_pairing" name="second_pairing" value="${secondPairing.name}"></input>
+        <input type="submit" value="Add Your Interpretation"></input>
         </form>
     `
     formDiv.innerHTML = html
-    // document.querySelector('form').addEventListener('submit', createOrUpdateVignette)
+    document.querySelector('form').addEventListener('submit', saveVignette)
+}
+
+//         <input type="text" id="user-interpretation" name="user-interpretation"></input>
+
+function saveVignette(e) {
+    e.preventDefault()
+    let vignette = {
+        title: `${e.target.querySelector('#first_card').value} + ${e.target.querySelector('#second_card').value} + ${e.target.querySelector('#third_card').value}`,
+        first_card: e.target.querySelector('#first_card').value,
+        second_card: e.target.querySelector('#second_card').value,
+        third_card: e.target.querySelector('#third_card').value,
+        first_pairing: e.target.querySelector('#first_pairing').value,
+        second_pairing: e.target.querySelector('#second_pairing').value
+    }
+    let configObject = {
+        method: 'POST',
+        body: JSON.stringify(vignette),
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    }
+    fetch(BASE_URL + '/vignettes', configObject)
+    .then(res => res.json())
+    .then(vignette => {
+        displayInterpretationForm(vignette)
+    })
+}
+
+function displayInterpretationForm(vignette) {
+    let main = document.querySelector("main")
+    main.innerHTML += `
+        <form id="interpretation">
+            <input type="hidden" id="vignette" value="${vignette.id}"></input>
+            <input type="text" id="content"></input>
+            <input type="submit"></input>
+        </form>
+    `
+    document.querySelector('#interpretation').addEventListener('submit', submitInterpretation)
+}
+
+function submitInterpretation(e) {
+    e.preventDefault()
+    let interpretation = {
+        vignette_id: e.target.querySelector('#vignette').value,
+        content: e.target.querySelector('#content').value
+    }
+    let configObject = {
+        method: 'POST',
+        body: JSON.stringify(interpretation),
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    }
+    fetch(BASE_URL + '/interpretations', configObject)
+    .then(res => res.json())
+    .then(interpretation => {
+        showVignette(interpretation.vignette)
+    })
+}
+
+function showVignette(vignette) {
+    let main = document.querySelector("main")
+    main.innerHTML = ""
+    main.innerHTML += `
+        <h3>Vignette: ${vignette.title}</h3>
+        <div id="VC1"></div>
+        <div id="VC2"></div>
+        <div id="VC3"></div>
+        <h4>Combination of Pairings <i>${vignette.first_pairing}</i> and <i>${vignette.second_pairing}</i></h4>
+        <p><strong>Possible ${vignette.first_pairing} Meanings:</strong></p>
+        <p><strong>Possible ${vignette.second_pairing} Meanings:</strong></p>
+        <h4>Community Interpretations</h4>
+        <ul id="interpretations"></ul>
+    `
+    debugger
+    if (vignette.interpretations == null) {
+        main.innerHTML += "There are no community interpretations for this card yet."
+    } else {
+        let interpretationsList = document.getElementById('interpretations')
+        vignette.interpretations.forEach(interpretation =>
+            interpretationsList.innerHTML += `
+                <li>${interpretation}</li>
+            `
+        )
+    }
 }
 
 // function createOrUpdateVignette(e) {
 //     e.preventDefault()
-//     let vignette = {
-//         title: `${e.target.querySelector('#first_card').value} + ${e.target.querySelector('#second_card').value} + ${e.target.querySelector('#third_card').value}`,
-//         first_card: e.target.querySelector('#first_card').value,
-//         second_card: e.target.querySelector('#second_card').value,
-//         third_card: e.target.querySelector('#third_card').value,
-//         first_pairing: e.target.querySelector('#first_pairing').value,
-//         second_pairing: e.target.querySelector('#second_pairing').value,
-//     }
+    // let vignette = {
+    //     title: `${e.target.querySelector('#first_card').value} + ${e.target.querySelector('#second_card').value} + ${e.target.querySelector('#third_card').value}`,
+    //     first_card: e.target.querySelector('#first_card').value,
+    //     second_card: e.target.querySelector('#second_card').value,
+    //     third_card: e.target.querySelector('#third_card').value,
+    //     first_pairing: e.target.querySelector('#first_pairing').value,
+    //     second_pairing: e.target.querySelector('#second_pairing').value,
+    // }
 //     // debugger
-//     let configObject = {
-//         method: 'POST',
-//         body: JSON.stringify(vignette),
-//         headers: {
-//             'Content-Type': 'application/json',
-//             'Accept': 'application/json'
-//         }
-//     }
+    // let configObject = {
+    //     method: 'POST',
+    //     body: JSON.stringify(vignette),
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //         'Accept': 'application/json'
+    //     }
+    // }
 //     let vignetteData
 //     fetch(BASE_URL + '/vignettes', configObject).then(response => {
 //         if (response.ok) {
@@ -288,23 +373,23 @@ function displayInterpretationForm() {
 //         let main = document.querySelector("main")
 //         main.innerHTML = ""
 //         main.innerHTML += `
-//             <h3>Vignette: ${vignette.title}</h3>
-//             <div id="VC1"></div>
-//             <div id="VC2"></div>
-//             <div id="VC3"></div>
-//             <h4>Combination of Pairings <i>${vignette.first_pairing}</i> and <i>${vignette.second_pairing}</i></h4>
-//             <p><strong>Possible ${vignette.first_pairing} Meanings:</strong></p>
-//             <p><strong>Possible ${vignette.second_pairing} Meanings:</strong></p>
-//             <h4>Community Interpretations</h4>
-//             <ul id="interpretations"></ul>
-//         `
-//         if (vignette.interpretations == null) {
-//             main.innerHTML += "There are no community interpretations for this card yet."
-//         } else {
-//             let interpretationsList = document.getElementById('interpretations')
-//             vignette.interpretations.forEach(interpretation =>
-//                 interpretationsList.innerHTML += `
-//                     <li>${interpretation}</li>
+        //     <h3>Vignette: ${vignette.title}</h3>
+        //     <div id="VC1"></div>
+        //     <div id="VC2"></div>
+        //     <div id="VC3"></div>
+        //     <h4>Combination of Pairings <i>${vignette.first_pairing}</i> and <i>${vignette.second_pairing}</i></h4>
+        //     <p><strong>Possible ${vignette.first_pairing} Meanings:</strong></p>
+        //     <p><strong>Possible ${vignette.second_pairing} Meanings:</strong></p>
+        //     <h4>Community Interpretations</h4>
+        //     <ul id="interpretations"></ul>
+        // `
+        // if (vignette.interpretations == null) {
+        //     main.innerHTML += "There are no community interpretations for this card yet."
+        // } else {
+        //     let interpretationsList = document.getElementById('interpretations')
+        //     vignette.interpretations.forEach(interpretation =>
+        //         interpretationsList.innerHTML += `
+        //             <li>${interpretation}</li>
 //                 `
 //             )
 //         }
