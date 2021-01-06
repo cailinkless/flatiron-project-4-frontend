@@ -3,10 +3,27 @@ const BASE_URL = 'http://localhost:3000'
 let deck
 
 window.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("welcome").addEventListener('click', welcomeMessage)
     document.getElementById("start-reading").addEventListener('click', startReading)
     document.getElementById("dictionary").addEventListener('click', getCards)
     createDeck()
+    welcomeMessage()
 })
+
+function welcomeMessage() {
+    let main = document.querySelector("main")
+    main.innerHTML = ""
+    main.innerHTML = `
+    <p><strong>Welcome to the Lenormand Phrasebook!</strong>
+    <br><br>
+    Here you can practice your Lenormand reading skills by drawing from our digital card deck to create a short sequence of cards (a <i>three card vignette</i> in Lenormand terminology).
+    <br><br>
+    Possible meanings of your card combination will be suggested, but since readings are highly dependent on your personal context and mental associations, we encourage you to share your own interpretation, and browse vignette interpretations by other community members.
+    <br><br>Happy Reading!</p>
+    `
+}
+
+
 
 function startReading() {
     let main = document.querySelector("main")
@@ -105,7 +122,81 @@ function thirdDraw() {
         <p>Possible Meanings: ${pairing.meaning}</p>
         <h3>Reading this Vignette:</h3>
         <p>Info on reading vignettes</p>
+        <div id="interpretation-form"></div>
     `
+    displayInterpretationForm()
+}
+
+function displayInterpretationForm() {
+    let formDiv = document.getElementById("interpretation-form")
+    let possPairings1 = deck.find(card => card.id === parseInt(document.getElementById("first-card-id").innerHTML.split(". ")[0])).pairings
+    let firstPairing = possPairings1.find(pairing => pairing.card_2 === parseInt(document.getElementById("second-card-id").innerHTML.split(". ")[0]))
+    let possPairings2 = deck.find(card => card.id === parseInt(document.getElementById("second-card-id").innerHTML.split(". ")[0])).pairings
+    let secondPairing = possPairings2.find(pairing => pairing.card_2 === parseInt(document.getElementById("third-card-id").innerHTML.split(". ")[0]))
+    let html = `
+        <form>
+        <label>Add Your Interpretation:</label>
+        <input type="hidden" id="first_card" name="first_card" value="${parseInt(document.getElementById("first-card-id").innerHTML.split(". ")[0])}">
+        <input type="hidden" id="second_card" name="second_card" value="${parseInt(document.getElementById("second-card-id").innerHTML.split(". ")[0])}">
+        <input type="hidden" id="third_card" name="third_card" value="${parseInt(document.getElementById("third-card-id").innerHTML.split(". ")[0])}">
+        <input type="hidden" id="first_pairing" name="first_pairing" value="${firstPairing.name}">
+        <input type="hidden" id="second_pairing" name="second_pairing" value="${secondPairing.name}">
+        <input type="text" id="user-interpretation" name="user-interpretation"></input>
+        <input type="submit"></input>
+        </form>
+    `
+    formDiv.innerHTML = html
+    document.querySelector('form').addEventListener('submit', createOrUpdateVignette)
+}
+
+function createOrUpdateVignette(e) {
+    e.preventDefault()
+    let vignette = {
+        title: `${e.target.querySelector('#first_card').value} + ${e.target.querySelector('#second_card').value} + ${e.target.querySelector('#third_card').value}`,
+        first_card: e.target.querySelector('#first_card').value,
+        second_card: e.target.querySelector('#second_card').value,
+        third_card: e.target.querySelector('#third_card').value,
+        first_pairing: e.target.querySelector('#first_pairing').value,
+        second_pairing: e.target.querySelector('#second_pairing').value,
+        interpretations: [
+            e.target.querySelector('#user-interpretation').value
+        ]
+    }
+    let configObject = {
+        method: 'POST',
+        body: JSON.stringify(vignette),
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    }
+    fetch(BASE_URL + '/vignettes', configObject)
+    .then(res => res.json())
+    .then(vignette => {
+        let main = document.querySelector("main")
+        main.innerHTML = ""
+        main.innerHTML += `
+            <h3>Vignette: ${vignette.title}</h3>
+            <div id="VC1"></div>
+            <div id="VC2"></div>
+            <div id="VC3"></div>
+            <h4>Combination of Pairings <i>${vignette.first_pairing}</i> and <i>${vignette.second_pairing}</i></h4>
+            <p><strong>Possible ${vignette.first_pairing} Meanings:</strong></p>
+            <p><strong>Possible ${vignette.second_pairing} Meanings:</strong></p>
+            <h4>Community Interpretations</h4>
+            <ul id="interpretations"></ul>
+        `
+        if (vignette.interpretations == null) {
+            main.innerHTML += "There are no community interpretations for this card yet."
+        } else {
+            let interpretationsList = document.getElementById('interpretations')
+            vignette.interpretations.forEach(interpretation =>
+                interpretationsList.innerHTML += `
+                    <li>${interpretation}</li>
+                `
+            )
+        }
+    })
 }
 
 function createDeck() {
