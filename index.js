@@ -65,6 +65,7 @@ function showCard(e) {
     .then(card => {
         main.innerHTML = `
             <h2>${card.number}. ${card.name}</h2>
+            <img src="img/${card.img_url}" alt="${card.name} Symbol"/>
             <h4>Keyword: ${card.keyword}</h4>
             <h4>Common Card: ${card.common_card}</h4>
             <p>Description: ${card.description}</p>
@@ -75,7 +76,7 @@ function showCard(e) {
         let pairList = document.getElementById("pairings")
         card.pairings.forEach(pairing => {
             pairList.innerHTML += `
-                <li><a href="#" data-id="${pairing.id}" class="pairing">+ ${deck.find(card => card.number == pairing.card_2).name}</a></li>
+                <li><a href="#" data-id="${pairing.id}" class="pairing">${card.name} + ${deck.find(card => card.number == pairing.card_2).name}</a></li>
             `
         })
         attachClicksToPairingLinks()
