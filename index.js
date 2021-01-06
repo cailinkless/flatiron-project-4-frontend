@@ -62,11 +62,27 @@ class Vignette {
     }
 
     renderVignette() {
-
-    }
-
-    addInterpretation() {
-
+        let main = Formatter.clearMain()
+        main.innerHTML = `
+             <h2>${this.title}</h2>
+             <h4>Pairings:</h4>
+             <ul id="pairings">
+             </ul>
+             <h4>User Interpretations:</h4>
+             <ol id="interpretations">
+             </ol>
+        `
+        let pairList = document.getElementById("pairings")
+        pairList.innerHTML += `
+            <li>${this.first_pairing}</li>
+            <li>${this.second_pairing}</li>
+        `
+        let interpretationList = document.getElementById("interpretations")
+        this.interpretations.map(interpretation => {
+            interpretationList.innerHTML += `
+                <li>${interpretation.content}</li>
+            `
+        })
     }
 
 }
@@ -88,6 +104,30 @@ class Formatter {
         let main = document.querySelector("main")
         main.innerHTML = ""
         return main
+    }
+
+    static renderVignette(vignette) {
+        let main = Formatter.clearMain()
+        main.innerHTML = `
+             <h2>${vignette.title}</h2>
+             <h4>Pairings:</h4>
+             <ul id="pairings">
+             </ul>
+             <h4>User Interpretations:</h4>
+             <ol id="interpretations">
+             </ol>
+        `
+        let pairList = document.getElementById("pairings")
+        pairList.innerHTML += `
+            <li>${vignette.first_pairing}</li>
+            <li>${vignette.second_pairing}</li>
+        `
+        let interpretationList = document.getElementById("interpretations")
+        vignette.interpretations.map(interpretation => {
+            interpretationList.innerHTML += `
+                <li>${interpretation.content}</li>
+            `
+        })
     }
 
 }
@@ -149,28 +189,33 @@ function showVignette(e) {
     let main = Formatter.clearMain()
     fetch(BASE_URL + `/vignettes/${id}`)
     .then(res => res.json())
-    .then(vignette => {
-        main.innerHTML = `
-            <h2>${vignette.title}</h2>
-            <h4>Pairings:</h4>
-            <ul id="pairings">
-            </ul>
-            <h4>User Interpretations:</h4>
-            <ol id="interpretations">
-            </ol>
-        `
-        let pairList = document.getElementById("pairings")
-        pairList.innerHTML += `
-                <li>${vignette.first_pairing}</li>
-                <li>${vignette.second_pairing}</li>
-            `
-        let interpretationList = document.getElementById("interpretations")
-        vignette.interpretations.map(interpretation => {
-            interpretationList.innerHTML += `
-                <li>${interpretation.content}</li>
-            `
-        })
+    .then(data => {
+        let vignette = new Vignette(data.title, data.first_card, data.second_card, data.third_card, data.first_pairing, data.second_pairing, data.interpretations)
+        // Formatter.renderVignette(vignette)
+        vignette.renderVignette()
     })
+    // .then(vignette => {
+        // main.innerHTML = `
+        //     <h2>${vignette.title}</h2>
+        //     <h4>Pairings:</h4>
+        //     <ul id="pairings">
+        //     </ul>
+        //     <h4>User Interpretations:</h4>
+        //     <ol id="interpretations">
+        //     </ol>
+        // `
+        // let pairList = document.getElementById("pairings")
+        // pairList.innerHTML += `
+        //         <li>${vignette.first_pairing}</li>
+        //         <li>${vignette.second_pairing}</li>
+        //     `
+        // let interpretationList = document.getElementById("interpretations")
+        // vignette.interpretations.map(interpretation => {
+        //     interpretationList.innerHTML += `
+        //         <li>${interpretation.content}</li>
+        //     `
+    //     })
+    // })
 }
 
 // Feature: Card Dictionary
