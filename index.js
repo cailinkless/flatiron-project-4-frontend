@@ -377,31 +377,40 @@ function displayVignetteForm() {
         </form>
     `
     formDiv.innerHTML = html
-    document.querySelector('form').addEventListener('submit', createVignette)
+    document.querySelector('form').addEventListener('submit', findOrCreateVignette)
 }
 
-function createVignette(e) {
+function findOrCreateVignette(e) {
     e.preventDefault()
-    let vignette = {
-        title: e.target.querySelector('#title').value,
-        first_card: e.target.querySelector('#first_card').value,
-        second_card: e.target.querySelector('#second_card').value,
-        third_card: e.target.querySelector('#third_card').value,
-        first_pairing: e.target.querySelector('#first_pairing').value,
-        second_pairing: e.target.querySelector('#second_pairing').value
-    }
-    let configObject = {
-        method: 'POST',
-        body: JSON.stringify(vignette),
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-        }
-    }
-    fetch(BASE_URL + '/vignettes', configObject)
+    fetch(BASE_URL + '/vignettes')
     .then(res => res.json())
-    .then(vignette => {
-        displayInterpretationForm(vignette)
+    .then( vignettes => {
+        debugger
+        if (vignettes.find(vignette => vignette.title == e.target.querySelector('#title').value)) {
+            displayInterpretationForm(vignettes.find(vignette => vignette.title == e.target.querySelector('#title').value))
+        } else {
+            let vignette = {
+                title: e.target.querySelector('#title').value,
+                first_card: e.target.querySelector('#first_card').value,
+                second_card: e.target.querySelector('#second_card').value,
+                third_card: e.target.querySelector('#third_card').value,
+                first_pairing: e.target.querySelector('#first_pairing').value,
+                second_pairing: e.target.querySelector('#second_pairing').value
+            }
+            let configObject = {
+                method: 'POST',
+                body: JSON.stringify(vignette),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            }
+            fetch(BASE_URL + '/vignettes', configObject)
+            .then(res => res.json())
+            .then(vignette => {
+                displayInterpretationForm(vignette)
+            })
+        }
     })
 }
 
