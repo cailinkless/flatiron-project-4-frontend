@@ -117,6 +117,20 @@ class Formatter {
 
 }
 
+function compare(a, b) {
+    // Use toUpperCase() to ignore character casing
+    const A = a.title.toUpperCase();
+    const B = b.title.toUpperCase();
+  
+    let comparison = 0;
+    if (A > B) {
+      comparison = 1;
+    } else if (A < B) {
+      comparison = -1;
+    }
+    return comparison;
+}
+
 // Welcome: Upon arrival and when 'Home' button is clicked
 function welcomeMessage() {
     let main = Formatter.clearMain()
@@ -142,7 +156,8 @@ function displayVignetteIndex() {
     fetch(BASE_URL + '/vignettes')
     .then(res => res.json())
     .then(vignettes => {
-        vignettes.map(vignette => {
+        debugger
+        vignettes.sort(compare).map(vignette => {
             vignetteIndex.innerHTML += `
                 <li><a href="#" data-id="${vignette.id}">${vignette.title}</a></li>
             `
