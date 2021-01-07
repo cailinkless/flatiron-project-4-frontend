@@ -60,7 +60,8 @@ class Pairing {
 
 class Vignette {
 
-    constructor(title, first_card, second_card, third_card, first_pairing, second_pairing, interpretations) {
+    constructor(id, title, first_card, second_card, third_card, first_pairing, second_pairing, interpretations) {
+        this.id = id
         this.title = title
         this.first_card = first_card
         this.second_card = second_card
@@ -92,6 +93,7 @@ class Vignette {
                 <li>${interpretation.content}</li>
             `
         })
+        displayInterpretationForm(this)
     }
 
 }
@@ -117,7 +119,7 @@ class Formatter {
 
 }
 
-function compare(a, b) {
+function compareTitle(a, b) {
     // Use toUpperCase() to ignore character casing
     const A = a.title.toUpperCase();
     const B = b.title.toUpperCase();
@@ -156,8 +158,7 @@ function displayVignetteIndex() {
     fetch(BASE_URL + '/vignettes')
     .then(res => res.json())
     .then(vignettes => {
-        debugger
-        vignettes.sort(compare).map(vignette => {
+        vignettes.sort(compareTitle).map(vignette => {
             vignetteIndex.innerHTML += `
                 <li><a href="#" data-id="${vignette.id}">${vignette.title}</a></li>
             `
@@ -177,7 +178,7 @@ function showVignette(id) {
     fetch(BASE_URL + `/vignettes/${id}`)
     .then(res => res.json())
     .then(data => {
-        let vignette = new Vignette(data.title, data.first_card, data.second_card, data.third_card, data.first_pairing, data.second_pairing, data.interpretations)
+        let vignette = new Vignette(data.id, data.title, data.first_card, data.second_card, data.third_card, data.first_pairing, data.second_pairing, data.interpretations)
         vignette.renderVignette()
     })
 }
