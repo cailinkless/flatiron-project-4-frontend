@@ -1,113 +1,117 @@
-// Startup Info
 
-const BASE_URL = 'http://localhost:3000'
+///// Startup Info
 
-let deck
-let firstCard
-let secondCard
-let thirdCard
+    const BASE_URL = 'http://localhost:3000'
 
-// Gets array of 36 cards to work with
-function createDeck() {
-    fetch(BASE_URL + '/cards')
-    .then(res => res.json())
-    .then(cards => deck = cards)
-}
+    let deck
+    let firstCard
+    let secondCard
+    let thirdCard
 
-window.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("welcome").addEventListener('click', welcomeMessage)
-    document.getElementById("browse").addEventListener('click', displayVignetteIndex)
-    document.getElementById("start-reading").addEventListener('click', startReading)
-    document.getElementById("dictionary").addEventListener('click', getCards)
-    createDeck()
-    welcomeMessage()
-})
-
-// Object Classes
-
-class Card {
-
-    constructor(number, name, img_url, keyword, description, common_card, pairings) {
-        this.number = number
-        this.name = name
-        this.img_url = img_url
-        this.keyword = keyword
-        this.description = description
-        this.common_card = common_card
-        this.pairings = pairings
+    // Gets array of 36 cards to work with
+    function createDeck() {
+        fetch(BASE_URL + '/cards')
+        .then(res => res.json())
+        .then(cards => deck = cards)
     }
 
-    renderCard() {
+    // Set up nav links & create a deck
+    window.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("welcome").addEventListener('click', welcomeMessage)
+        document.getElementById("browse").addEventListener('click', displayVignetteIndex)
+        document.getElementById("start-reading").addEventListener('click', startReading)
+        document.getElementById("dictionary").addEventListener('click', getCards)
+        createDeck()
+        welcomeMessage()
+    })
+
+///// Object Classes
+
+    // do I ever use this????
+    class Card {
+
+        constructor(number, name, img_url, keyword, description, common_card, pairings) {
+            this.number = number
+            this.name = name
+            this.img_url = img_url
+            this.keyword = keyword
+            this.description = description
+            this.common_card = common_card
+            this.pairings = pairings
+        }
+
+        renderCard() {
         //do as get method type???
-    }
-
-}
-
-class Pairing {
-
-    constructor(name, card_2, meaning, card) {
-        this.name = name
-        this.card_2 = card_2
-        this.meaning = meaning
-        this.card = card 
-    }
-
-    renderPairing() {
+        }
 
     }
 
-}
+    // do I ever use this????
+    class Pairing {
 
-class Vignette {
+        constructor(name, card_2, meaning, card) {
+            this.name = name
+            this.card_2 = card_2
+            this.meaning = meaning
+            this.card = card 
+        }
 
-    constructor(id, title, first_card, second_card, third_card, first_pairing, second_pairing, interpretations) {
-        this.id = id
-        this.title = title
-        this.first_card = first_card
-        this.second_card = second_card
-        this.third_card = third_card
-        this.first_pairing = first_pairing
-        this.second_pairing = second_pairing
-        this.interpretations = interpretations
+        renderPairing() {
+
+        }
+
     }
 
-    renderVignette() {
-        let main = Formatter.clearMain()
-        main.innerHTML = `
-             <h2>${this.title}</h2>
-             <h4>Pairings:</h4>
-             <ul id="pairings">
-             </ul>
-             <h4>User Interpretations:</h4>
-             <ol id="interpretations">
-             </ol>
-        `
-        let pairList = document.getElementById("pairings")
-        pairList.innerHTML += `
-            <li>${this.first_pairing}</li>
-            <li>${this.second_pairing}</li>
-        `
-        let interpretationList = document.getElementById("interpretations")
-        this.interpretations.map(interpretation => {
-            interpretationList.innerHTML += `
-                <li>${interpretation.content}</li>
+    class Vignette {
+
+        constructor(id, title, first_card, second_card, third_card, first_pairing, second_pairing, interpretations) {
+            this.id = id
+            this.title = title
+            this.first_card = first_card
+            this.second_card = second_card
+            this.third_card = third_card
+            this.first_pairing = first_pairing
+            this.second_pairing = second_pairing
+            this.interpretations = interpretations
+        }
+
+        renderVignette() {
+            let main = Formatter.clearMain()
+            main.innerHTML = `
+                <h2>${this.title}</h2>
+                <h4>Pairings:</h4>
+                <ul id="pairings">
+                </ul>
+                <h4>User Interpretations:</h4>
+                <ol id="interpretations">
+                </ol>
             `
-        })
-        displayInterpretationForm(this)
+            let pairList = document.getElementById("pairings")
+            pairList.innerHTML += `
+                <li>${this.first_pairing}</li>
+                <li>${this.second_pairing}</li>
+            `
+            let interpretationList = document.getElementById("interpretations")
+            this.interpretations.map(interpretation => {
+                interpretationList.innerHTML += `
+                    <li>${interpretation.content}</li>
+                `
+            })
+            displayInterpretationForm(this)
+        }
+
     }
 
-}
+    class Interpretation {
 
-class Interpretation {
+        constructor(content, vignette_id) {
+            this.content = content
+            this.vignette_id = vignette_id
+        }
 
-    constructor(content, vignette_id) {
-        this.content = content
-        this.vignette_id = vignette_id
     }
 
-}
-
-// Helper Classes
+///// Helper Classes & Functions
 
 class Formatter {
 
@@ -120,7 +124,6 @@ class Formatter {
 }
 
 function compareTitle(a, b) {
-    // Use toUpperCase() to ignore character casing
     const A = a.title.toUpperCase();
     const B = b.title.toUpperCase();
   
@@ -133,7 +136,8 @@ function compareTitle(a, b) {
     return comparison;
 }
 
-// Welcome: Upon arrival and when 'Home' button is clicked
+///// Welcome: Upon arrival and when 'Home' button is clicked
+
 function welcomeMessage() {
     let main = Formatter.clearMain()
     main.innerHTML = `
@@ -146,44 +150,7 @@ function welcomeMessage() {
     `
 }
 
-// Feature: Vignette Index
-
-function displayVignetteIndex() {
-    let main = Formatter.clearMain()
-    main.innerHTML = `
-        <h3>Community Vignettes:</h3>
-        <ul id="vignette-index"></ul>
-    `
-    let vignetteIndex = document.getElementById("vignette-index")
-    fetch(BASE_URL + '/vignettes')
-    .then(res => res.json())
-    .then(vignettes => {
-        vignettes.sort(compareTitle).map(vignette => {
-            vignetteIndex.innerHTML += `
-                <li><a href="#" data-id="${vignette.id}">${vignette.title}</a></li>
-            `
-        })
-        attachClicksToVignettes()
-    })
-}
-
-function attachClicksToVignettes() {
-    let vignettes = document.querySelectorAll("li a")
-    vignettes.forEach(vignette => {
-        vignette.addEventListener('click', (e) => showVignette(e.target.dataset.id))
-    })
-}
-
-function showVignette(id) {
-    fetch(BASE_URL + `/vignettes/${id}`)
-    .then(res => res.json())
-    .then(data => {
-        let vignette = new Vignette(data.id, data.title, data.first_card, data.second_card, data.third_card, data.first_pairing, data.second_pairing, data.interpretations)
-        vignette.renderVignette()
-    })
-}
-
-// Feature: Card Dictionary
+///// CARDS: Index & Show
 
 function getCards() {
     let main = Formatter.clearMain()
@@ -240,6 +207,8 @@ function attachClicksToPairingLinks() {
     })
 }
 
+// PAIRINGS: Show
+
 function showPairing(e) {
     let id = e.target.dataset.id
     let main = Formatter.clearMain()
@@ -253,6 +222,45 @@ function showPairing(e) {
         `
     })
 }
+
+// VIGNETTES: Index & Show
+
+function displayVignetteIndex() {
+    let main = Formatter.clearMain()
+    main.innerHTML = `
+        <h3>Community Vignettes:</h3>
+        <ul id="vignette-index"></ul>
+    `
+    let vignetteIndex = document.getElementById("vignette-index")
+    fetch(BASE_URL + '/vignettes')
+    .then(res => res.json())
+    .then(vignettes => {
+        vignettes.sort(compareTitle).map(vignette => {
+            vignetteIndex.innerHTML += `
+                <li><a href="#" data-id="${vignette.id}">${vignette.title}</a></li>
+            `
+        })
+        attachClicksToVignettes()
+    })
+}
+
+function attachClicksToVignettes() {
+    let vignettes = document.querySelectorAll("li a")
+    vignettes.forEach(vignette => {
+        vignette.addEventListener('click', (e) => showVignette(e.target.dataset.id))
+    })
+}
+
+function showVignette(id) {
+    fetch(BASE_URL + `/vignettes/${id}`)
+    .then(res => res.json())
+    .then(data => {
+        let vignette = new Vignette(data.id, data.title, data.first_card, data.second_card, data.third_card, data.first_pairing, data.second_pairing, data.interpretations)
+        vignette.renderVignette()
+    })
+}
+
+
 
 // Practice Reading Feature
 
@@ -357,6 +365,8 @@ function thirdDraw() {
     `
     displayVignetteForm()
 }
+
+///// VIGNETTES: Create and/or Update
 
 function displayVignetteForm() {
     let formDiv = document.getElementById("vignette-form")
