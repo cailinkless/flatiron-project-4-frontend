@@ -1,0 +1,47 @@
+body {
+    background-color: bisque;
+}
+
+main {
+
+    display: flex;
+    justify-content: center;
+    flex-flow: row wrap;
+
+}
+
+#spread {
+
+    /* margin: 10px; */
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+    /* align-items: self-start; */
+    flex-flow: row wrap;
+
+}
+
+.drawn-card {
+    width: 25%;
+    text-align: center;
+    border: solid black 2px;
+
+}
+
+#spread-pairings {
+    margin: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.spread-pairing {
+    width: 35%;
+    text-align: center;
+    border: solid black 2px;
+}
+
+#advice {
+    width: 100%;
+    margin: 10px;
+}

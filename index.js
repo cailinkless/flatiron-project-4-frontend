@@ -25,6 +25,8 @@
         welcomeMessage()
     })
 
+
+
 ///// Object Classes
 
     // do I ever use this????
@@ -111,8 +113,11 @@
 
     }
 
+
+
 ///// Helper Classes & Functions
 
+// Holds a method to clear the main html
 class Formatter {
 
     static clearMain() {
@@ -123,6 +128,7 @@ class Formatter {
 
 }
 
+// Alphabetizes -- for use in the Vignettes Index
 function compareTitle(a, b) {
     const A = a.title.toUpperCase();
     const B = b.title.toUpperCase();
@@ -135,6 +141,13 @@ function compareTitle(a, b) {
     }
     return comparison;
 }
+
+// Selects a random card ID for drawing cards - with safeguard against repeats
+function getRandomCardId() {
+    return Math.floor(Math.random() * Math.floor(35)) + 1;
+}
+
+
 
 ///// Welcome: Upon arrival and when 'Home' button is clicked
 
@@ -150,13 +163,17 @@ function welcomeMessage() {
     `
 }
 
+
+
 ///// CARDS: Index & Show
 
 function getCards() {
     let main = Formatter.clearMain()
     main.innerHTML = `
+    <div id="card-dictionary">
         <h3>Card Dictionary</h3>
         <ul id="card-index"></ul>
+    </div>
     `
     let cardIndex = document.getElementById("card-index")
     deck.map(card => {
@@ -207,7 +224,9 @@ function attachClicksToPairingLinks() {
     })
 }
 
-// PAIRINGS: Show
+
+
+///// PAIRINGS: Show
 
 function showPairing(e) {
     let id = e.target.dataset.id
@@ -223,13 +242,17 @@ function showPairing(e) {
     })
 }
 
-// VIGNETTES: Index & Show
+
+
+///// VIGNETTES: Index & Show
 
 function displayVignetteIndex() {
     let main = Formatter.clearMain()
     main.innerHTML = `
+    <div id="vignettes">
         <h3>Community Vignettes:</h3>
         <ul id="vignette-index"></ul>
+    </div>
     `
     let vignetteIndex = document.getElementById("vignette-index")
     fetch(BASE_URL + '/vignettes')
@@ -262,23 +285,27 @@ function showVignette(id) {
 
 
 
-// Practice Reading Feature
+///// Practice Reading Feature
 
 
 function startReading() {
     let main = Formatter.clearMain()
     main.innerHTML = `
-        <div id="card-1">
+    <div id="spread">
+        <div id="card-1" class="drawn-card">
             <input type="button" value="Draw Card 1" id="1st-draw">
         </div>
 
-        <div id="card-2">
+        <div id="card-2" class="drawn-card">
             <input type="button" value="Draw Card 2" id="2nd-draw" disabled>
         </div>
 
-        <div id="card-3">
+        <div id="card-3" class="drawn-card">
             <input type="button" value="Draw Card 3" id="3rd-draw" disabled>
         </div>
+    </div>
+    <div id="spread-pairings">
+    </div>
     `
     attachClicksToReading()
 }
@@ -288,14 +315,11 @@ function attachClicksToReading() {
     firstButton.addEventListener('click', firstDraw)
 }
 
-function getRandomCardId() {
-    return Math.floor(Math.random() * Math.floor(35)) + 1;
-}
-
 function firstDraw() {
     let card1 = document.getElementById("card-1")
     card1.innerHTML = ""
     let cardId = getRandomCardId()
+    debugger
     let card = deck.find(card => card.id == cardId)
     card1.innerHTML = `
         <h3>First Card:</h3>
@@ -325,10 +349,12 @@ function secondDraw() {
     // display information on the pairings of cards 1 & 2:
     let possPairings = deck.find(i => i.id === card1).pairings
     let pairing = possPairings.find(pairing => pairing.card_2 === card.id)
-    let main = document.querySelector("main")
-    main.innerHTML += `
+    let spreadPairings = document.querySelector("#spread-pairings")
+    spreadPairings.innerHTML += `
+    <div class="spread-pairing">
         <h4>First Pairing: ${pairing.name}</h4>
         <p>Possible Meanings: ${pairing.meaning}</p>
+    </div>
     `
     let thirdButton = document.getElementById('3rd-draw')
     thirdButton.disabled = false
@@ -355,16 +381,25 @@ function thirdDraw() {
     // display information on the pairings of cards 2 & 3:
     let possPairings = deck.find(card => card.id === secondCardId).pairings
     let pairing = possPairings.find(pairing => pairing.card_2 === thirdCardId)
-    let main = document.querySelector("main")
-    main.innerHTML += `
+    let spreadPairings = document.querySelector("#spread-pairings")
+    spreadPairings.innerHTML += `
+    <div class="spread-pairing">
         <h4>Second Pairing: ${pairing.name}</h4>
         <p>Possible Meanings: ${pairing.meaning}</p>
+    </div>
+    `
+    let main = document.querySelector("main")
+    main.innerHTML += `
+    <div id="advice">
         <h3>Reading this Vignette:</h3>
         <p>Info on reading vignettes</p>
         <div id="vignette-form"></div>
+    </div>
     `
     displayVignetteForm()
 }
+
+
 
 ///// VIGNETTES: Create and/or Update
 
@@ -395,7 +430,6 @@ function findOrCreateVignette(e) {
     fetch(BASE_URL + '/vignettes')
     .then(res => res.json())
     .then( vignettes => {
-        debugger
         if (vignettes.find(vignette => vignette.title == e.target.querySelector('#title').value)) {
             displayInterpretationForm(vignettes.find(vignette => vignette.title == e.target.querySelector('#title').value))
         } else {
@@ -425,6 +459,8 @@ function findOrCreateVignette(e) {
 }
 
 function displayInterpretationForm(vignette) {
+    let vignetteForm = document.getElementById("vignette-form")
+    vignetteForm.remove();
     let main = document.querySelector("main")
     main.innerHTML += `
         <form id="interpretation">
