@@ -45,3 +45,31 @@ main {
     width: 100%;
     margin: 10px;
 }
+
+#vignette-title {
+    width: 100%;
+}
+
+#pairings {
+    width: 100%;
+}
+
+#community-interpretations {
+    width: 100%;
+}
+
+#title-card {
+    width: 100%;
+}
+
+#title-card h2 {
+    width: 100%;
+}
+
+.card-img {
+    max-width: 40%;
+}
+
+#card-info {
+    width: 100%;
+}

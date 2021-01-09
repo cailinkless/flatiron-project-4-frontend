@@ -80,13 +80,17 @@
         renderVignette() {
             let main = Formatter.clearMain()
             main.innerHTML = `
-                <h2>${this.title}</h2>
-                <h4>Pairings:</h4>
-                <ul id="pairings">
-                </ul>
-                <h4>User Interpretations:</h4>
-                <ol id="interpretations">
-                </ol>
+                <h2 id="vignette-title">${this.title}</h2>
+                <div id="pairings">
+                    <h4>Pairings:</h4>
+                    <ul id="pairings">
+                    </ul>
+                </div>
+                <div id="community-interpretations">
+                    <h4>User Interpretations:</h4>
+                    <ol id="interpretations">
+                    </ol>
+                </div>
             `
             let pairList = document.getElementById("pairings")
             pairList.innerHTML += `
@@ -198,14 +202,18 @@ function showCard(e) {
     .then(res => res.json())
     .then(card => {
         main.innerHTML = `
-            <h2>${card.number}. ${card.name}</h2>
-            <img src="img/${card.img_url}" alt="${card.name} Symbol"/>
-            <h4>Keyword: ${card.keyword}</h4>
-            <h4>Common Card: ${card.common_card}</h4>
-            <p>Description: ${card.description}</p>
-            <h4>Pairings:</h4>
-            <ul id="pairings">
-            </ul>
+            <div id="title-card">
+                <h2>${card.number}. ${card.name}</h2>
+                <img src="img/${card.img_url}" alt="${card.name} Symbol" class="card-img"/>
+            </div>
+            <div id="card-info">
+                <h4>Keyword: ${card.keyword}</h4>
+                <h4>Common Card: ${card.common_card}</h4>
+                <p>Description: ${card.description}</p>
+                <h4>Pairings:</h4>
+                <ul id="pairings">
+                </ul>
+            </div>
         `
         let pairList = document.getElementById("pairings")
         card.pairings.forEach(pairing => {
@@ -235,9 +243,13 @@ function showPairing(e) {
     .then(res => res.json())
     .then(pairing => {
         main.innerHTML = `
-            <h2>${pairing.name}</h2>
-            <h4>Common Interpretations:</h4>
-            <p>${pairing.meaning}</p>
+            <div id="title-card">
+                <h2>${pairing.name}</h2>
+            </div>
+            <div id="pairing-interpretations">
+                <h4>Common Interpretations:</h4>
+                <p>${pairing.meaning}</p>
+            </div>
         `
     })
 }
@@ -319,7 +331,7 @@ function firstDraw() {
     let card1 = document.getElementById("card-1")
     card1.innerHTML = ""
     let cardId = getRandomCardId()
-    debugger
+    // debugger
     let card = deck.find(card => card.id == cardId)
     card1.innerHTML = `
         <h3>First Card:</h3>
@@ -459,11 +471,14 @@ function findOrCreateVignette(e) {
 }
 
 function displayInterpretationForm(vignette) {
-    let vignetteForm = document.getElementById("vignette-form")
-    vignetteForm.remove();
+    if (document.getElementById("vignette-form")) {
+        let vignetteForm = document.getElementById("vignette-form")
+        vignetteForm.remove();
+    }
     let main = document.querySelector("main")
     main.innerHTML += `
         <form id="interpretation">
+            <label>My Interpretation:</label>
             <input type="hidden" id="vignette" value="${vignette.id}"></input>
             <input type="text" id="content"></input>
             <input type="submit"></input>
